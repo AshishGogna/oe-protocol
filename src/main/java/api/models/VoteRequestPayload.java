@@ -13,7 +13,15 @@ public class VoteRequestPayload extends ApiRequest {
 
     /** Private declarations */
     private String electionId;
-    private String voterPublicKey;
-    private String voterSignature;
     private String candidateId;
+    private String voterFingerprint;
+    private String signature;
+
+    /** Public functions */
+    public VoteRequestPayload(String electionId, String voterFingerprint, String signature, String candidateId) {
+        this.electionId = electionId;
+        this.voterFingerprint = voterFingerprint;
+        this.signature = signature;
+        this.candidateId = candidateId;
+    }
 }

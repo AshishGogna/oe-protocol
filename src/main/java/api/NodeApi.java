@@ -7,7 +7,9 @@ import api.models.VoteResponsePayload;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import protocol.Node;
 import protocol.UnconfirmedPool;
+import protocol.models.NodeException;
 import protocol.models.Vote;
 
 import javax.validation.Validator;
@@ -49,9 +51,9 @@ public class NodeApi extends Api {
     @Path("/vote")
     public ApiResponse<VoteResponsePayload> vote(VoteRequestPayload request) {
         try {
-            String voteHash = UnconfirmedPool.getInstance().addVote(request);
-            return new ApiResponse(ApiStatus.OK, new VoteResponsePayload(voteHash!=null, voteHash));
-        } catch (Exception e) {
+            String voteDigink = Node.getInstance().vote(request);
+            return new ApiResponse(ApiStatus.OK, new VoteResponsePayload(voteDigink));
+        } catch (NodeException e) {
             LOGGER.error("Exception caught at /vote: {}", e);
             return processException(e);
         }

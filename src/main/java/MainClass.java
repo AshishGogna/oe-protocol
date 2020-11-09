@@ -2,6 +2,7 @@ import api.NodeApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import protocol.Blockchain;
+import protocol.Node;
 import protocol.UnconfirmedPool;
 
 /**
@@ -17,8 +18,7 @@ public class MainClass {
     public static void main(String[] args) {
         try {
 //            new NodeApplication().run(args);
-            UnconfirmedPool.initialize();
-            Blockchain.initialize();
+            Node.initialize(args[0]);
             LOGGER.info("*** Open Elections Node Initialized ***");
         } catch (Exception e) {
             LOGGER.error("Terminating due to exception while trying to initialize node: {}", e);

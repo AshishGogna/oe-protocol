@@ -10,7 +10,12 @@ public class NodeException extends Exception {
         FileAlreadyExists,
         VoteTampered,
         SystemFailure,
-        VoteAlradyExists
+        VoteAlradyExistsInUnconfirmedPool,
+        PreviousHashMismatch,
+        HashMismatch,
+        BlockTampered,
+        MerkleRootMismatch,
+        DiginkDuplicate
     }
 
     /** Private declarations */
@@ -24,6 +29,11 @@ public class NodeException extends Exception {
 
     public NodeException(Reason reason, String message) {
         super(message);
+        this.reason = reason;
+    }
+
+    public NodeException(Reason reason, Throwable cause) {
+        super(reason.toString(), cause);
         this.reason = reason;
     }
 

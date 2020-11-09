@@ -11,12 +11,10 @@ import lombok.Setter;
 public class VoteResponsePayload {
 
     /** Private declarations */
-    private boolean submittedForConsensus;
     private String voteHash;
 
     /** Public functions */
-    public VoteResponsePayload(boolean submittedForConsensus, String voteHash) {
-        this.submittedForConsensus = submittedForConsensus;
+    public VoteResponsePayload(String voteHash) {
         this.voteHash = voteHash;
     }
 }
