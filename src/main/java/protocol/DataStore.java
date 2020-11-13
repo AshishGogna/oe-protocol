@@ -1,11 +1,8 @@
 package protocol;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
-import org.omg.CORBA.Object;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import protocol.models.Auth;
@@ -31,6 +28,7 @@ public class DataStore {
     private static final String PATH_AUTH = "./auth";
     private static final String PATH_LWCS = "./registry/lwcs";
     private static final String PATH_AUTHS = "./registry/auths";
+    private static final String PATH_NODES = "./registry/nodes";
     private static final Logger LOGGER = LoggerFactory.getLogger(DataStore.class);
 
     /** Public functions */
@@ -46,7 +44,7 @@ public class DataStore {
         String path = PATH_BLOCKS + fileName;
 
         File f = new File(path);
-        if (f.exists()) throw new NodeException(NodeException.Reason.FileAlreadyExists);
+        if (f.exists()) throw new NodeException(NodeException.Reason.BlockAlreadyExists);
 
         writeToFile(path, data);
     }
@@ -74,6 +72,10 @@ public class DataStore {
     }
 
     public static List<String> readLWCs() throws Exception {
+
+        File f = new File(PATH_LWCS);
+        if (!f.exists()) return new ArrayList<>();
+
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode data = mapper.readValue(readFromFile(PATH_LWCS), ArrayNode.class);
         List<String> lwcs = new ArrayList<>();
@@ -82,6 +84,10 @@ public class DataStore {
     }
 
     public static List<String> readAuths() throws Exception {
+
+        File f = new File(PATH_AUTHS);
+        if (!f.exists()) return new ArrayList<>();
+
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode data = mapper.readValue(readFromFile(PATH_AUTHS), ArrayNode.class);
         List<String> auths = new ArrayList<>();
@@ -89,9 +95,93 @@ public class DataStore {
         return auths;
     }
 
+    public static List<String> readNodes() throws Exception {
+
+        File f = new File(PATH_NODES);
+        if (!f.exists()) return new ArrayList<>();
+
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayNode data = mapper.readValue(readFromFile(PATH_NODES), ArrayNode.class);
+        List<String> nodes = new ArrayList<>();
+        for (int i=0; i<data.size(); i++) nodes.add(data.get(i).asText());
+        return nodes;
+    }
+
+    public static void addNode(String endpoint) throws Exception {
+        List<String> nodes = readNodes();
+        if (nodes.contains(endpoint)) {
+            LOGGER.info("Node already exists in registry: {}", endpoint);
+            return;
+        }
+        nodes.add(endpoint);
+        Gson gson = new Gson();
+        writeToFile(PATH_NODES, gson.toJson(nodes));
+        LOGGER.info("Node added in registry: {}", endpoint);
+    }
+
+    public static void removeNode(String endpoint) throws Exception {
+        List<String> nodes = readNodes();
+        if (!nodes.contains(endpoint)) {
+            LOGGER.info("Node doesn't exist in registry: {}", endpoint);
+            return;
+        }
+        nodes.remove(endpoint);
+        Gson gson = new Gson();
+        writeToFile(PATH_NODES, gson.toJson(nodes));
+        LOGGER.info("Node removed from registry: {}", endpoint);
+    }
+
+    public static void addLWC(String publicKey) throws Exception {
+        List<String> lwcs = readLWCs();
+        if (lwcs.contains(publicKey)) {
+            LOGGER.info("LWC already exists in registry: {}", publicKey);
+            return;
+        }
+        lwcs.add(publicKey);
+        Gson gson = new Gson();
+        writeToFile(PATH_LWCS, gson.toJson(lwcs));
+        LOGGER.info("LWC added in registry: {}", publicKey);
+    }
+
+    public static void removeLWC(String publicKey) throws Exception {
+        List<String> lwcs = readLWCs();
+        if (!lwcs.contains(publicKey)) {
+            LOGGER.info("LWC doesn't exist in registry: {}", publicKey);
+            return;
+        }
+        lwcs.remove(publicKey);
+        Gson gson = new Gson();
+        writeToFile(PATH_LWCS, gson.toJson(lwcs));
+        LOGGER.info("LWC removed from registry: {}", publicKey);
+    }
+
+    public static void addAuth(String publicKey) throws Exception {
+        List<String> auths = readAuths();
+        if (auths.contains(publicKey)) {
+            LOGGER.info("Auth already exists in registry: {}", publicKey);
+            return;
+        }
+        auths.add(publicKey);
+        Gson gson = new Gson();
+        writeToFile(PATH_AUTHS, gson.toJson(auths));
+        LOGGER.info("Auth added in registry: {}", publicKey);
+    }
+
+    public static void removeAuth(String publicKey) throws Exception {
+        List<String> auths = readAuths();
+        if (!auths.contains(publicKey)) {
+            LOGGER.info("Auth doesn't exist in registry: {}", publicKey);
+            return;
+        }
+        auths.remove(publicKey);
+        Gson gson = new Gson();
+        writeToFile(PATH_AUTHS, gson.toJson(auths));
+        LOGGER.info("Auth removed from registry: {}", publicKey);
+    }
+
     /** Private functions */
     private static void writeToFile(String path, String data) throws IOException {
-        FileWriter myWriter = new FileWriter(PATH_SUMMARY);
+        FileWriter myWriter = new FileWriter(path);
         myWriter.write(data);
         myWriter.close();
     }

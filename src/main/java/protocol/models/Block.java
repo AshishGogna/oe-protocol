@@ -47,6 +47,10 @@ public class Block {
         return false;
     }
 
+    public void calculateHash() throws Exception {
+        this.hash = hash();
+    }
+
     public void setSignature(String signature) { this.signature = signature; }
     public void setHash(String hash) { this.hash = hash; }
 

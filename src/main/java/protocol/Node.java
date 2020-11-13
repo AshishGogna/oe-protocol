@@ -1,7 +1,10 @@
 package protocol;
 
 import api.models.VoteRequestPayload;
+import com.google.gson.Gson;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import protocol.models.Block;
 import protocol.models.NodeException;
 import protocol.models.Vote;
@@ -17,17 +20,20 @@ import java.util.List;
 public class Node {
 
     /** Private declarations */
+    private static final Logger LOGGER = LoggerFactory.getLogger(Node.class);
     private static Node instance;
 
     private String secret;
     private UnconfirmedPool unconfirmedPool;
     private Blockchain blockchain;
+    private Registery registery;
 
     /** Public functions */
     public Node(String secret) throws Exception {
         this.secret = secret;
         unconfirmedPool = new UnconfirmedPool();
         blockchain = new Blockchain();
+        registery = new Registery();
     }
 
     public static void initialize(String secret) throws Exception {
@@ -39,32 +45,12 @@ public class Node {
         return instance;
     }
 
-    public boolean isAuthorized() {
-        //TODO: Cryptographic validation pls.
-        return true;
-    }
-
     public String vote(VoteRequestPayload vrp) throws NodeException {
         return unconfirmedPool.addVote(vrp);
     }
 
-    public void submitVotesForConsensus(Collection<Vote> voteCollection) throws Exception {
-
-        //Generate merkle root
-        List<Vote> votes = new ArrayList<>();
-        List<String> diginks = new ArrayList<>();
-        for (Vote vote : voteCollection) {
-            votes.add(vote);
-            diginks.add(vote.getDigink());
-        }
-        String merkleRoot = Crypto.calculateMerkleRoot(diginks);
-
-        //Create block
-        Block block = new Block(System.currentTimeMillis(), blockchain.getSummary().getLastBlock(), merkleRoot, votes);
-
-        //Add into blockchain, if this node is authority.
-        blockchain.addBlock(block);
-    }
-
     public String getSecret() { return secret; }
+    public UnconfirmedPool getUnconfirmedPool() { return unconfirmedPool; }
+    public Blockchain getBlockchain() { return blockchain; }
+    public Registery getRegistery() { return registery; }
 }

@@ -7,10 +7,11 @@ public class NodeException extends Exception {
 
     /** Public declarations */
     public enum Reason {
-        FileAlreadyExists,
+        BlockAlreadyExists,
         VoteTampered,
         SystemFailure,
         VoteAlradyExistsInUnconfirmedPool,
+        VoteAlradyExistsInBlockchain,
         PreviousHashMismatch,
         HashMismatch,
         BlockTampered,

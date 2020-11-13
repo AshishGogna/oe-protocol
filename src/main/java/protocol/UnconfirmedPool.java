@@ -27,8 +27,8 @@ public class UnconfirmedPool {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleWithFixedDelay(new UnconfirmedPoolCleaner(), 1, 1, TimeUnit.SECONDS);
 
-        //Test
         try {
+//        Test
 //            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA");
 //            keyGen.initialize(1024, new SecureRandom());
 //            KeyPair pair = keyGen.generateKeyPair();
@@ -48,22 +48,20 @@ public class UnconfirmedPool {
 //            LOGGER.info("E = {}", e);
 //            String d = Crypto.decrypt(e, "");
 //            LOGGER.info("D = {}", d);
-
         } catch (Exception e) {
             LOGGER.error("{}", e);
         }
-
-//        VoteRequestPayload vrp = new VoteRequestPayload("GE2024", "MIIBtzCCASwGByqGSM44BAEwggEfAoGBAP1/U4EddRIpUt9KnC7s5Of2EbdSPO9EAMMeP4C2USZpRV1AIlH7WT2NWPq/xfW6MPbLm1Vs14E7gB00b/JmYLdrmVClpJ+f6AR7ECLCT7up1/63xhv4O1fnxqimFQ8E+4P208UewwI1VBNaFpEy9nXzrith1yrv8iIDGZ3RSAHHAhUAl2BQjxUjC8yykrmCouuEC/BYHPUCgYEA9+GghdabPd7LvKtcNrhXuXmUr7v6OuqC+VdMCz0HgmdRWVeOutRZT+ZxBxCBgLRJFnEj6EwoFhO3zwkyjMim4TwWeotUfI0o4KOuHiuzpnWRbqN/C/ohNWLx+2J6ASQ7zKTxvqhRkImog9/hWuWfBpKLZl6Ae1UlZAFMO/7PSSoDgYQAAoGAU7sM8Uhvzy7gF9MMocGKki52QLyco6tB0ClK7VMizK0BmaCXZdNfC2ryeLNYs26DypkU7UJZYdKd+sTNjRF4fUFt9fcZPt8HcfcBfr+/nkfGBHEa99NcfMdi/MLdW51hOjNTMz6T6Ub5QQIZnzMRdMxMMWrwFr6UDBuKUB1rYCY=", "")
     }
 
     public String addVote(VoteRequestPayload vrp) throws NodeException {
 
-        //Verify the sender lwc signature.
+        //Verify the LWC signature.
         boolean lwcSolid = false;
         try {
             List<String> lwcs = DataStore.readLWCs();
             for (String lwc : lwcs) {
-                lwcSolid = Crypto.verifySignature(vrp.getSignature(), lwc, vrp.jsonify());
+                VoteRequestPayload copy = new VoteRequestPayload(vrp);
+                lwcSolid = Crypto.verifySignature(vrp.getSignature(), lwc, copy.jsonify());
                 if (lwcSolid) break;
             }
         } catch (Exception ignored) { }
@@ -71,15 +69,16 @@ public class UnconfirmedPool {
 
         //Add to the unconfirmed pool
         try {
-            Vote v = new Vote(vrp.getElectionId(), vrp.getVoterFingerprint(), vrp.getCandidateId());
+            Vote v = new Vote(vrp.getElectionId(), vrp.getVoterFingerprint(), vrp.getConstituencyId(), vrp.getCandidateId());
 
             if (voteMap.containsKey(v.getDigink())) throw new NodeException(NodeException.Reason.VoteAlradyExistsInUnconfirmedPool);
-            //TODO: check if vote exists in blockchain
+            if (Node.getInstance().getBlockchain().voteExists(v.getDigink())) throw new NodeException(NodeException.Reason.VoteAlradyExistsInBlockchain);
 
+            LOGGER.info("Vote added to unconfirmed pool: {}", v.getDigink());
             voteMap.put(v.getDigink(), v);
             return v.getDigink();
         } catch (Exception e) {
-            throw new NodeException(NodeException.Reason.SystemFailure);
+            throw new NodeException(NodeException.Reason.SystemFailure, e);
         }
     }
 
@@ -89,8 +88,9 @@ public class UnconfirmedPool {
         /** Private classes: Public functions */
         public void run() {
             try {
-                Node.getInstance().submitVotesForConsensus(voteMap.values());
+                Node.getInstance().getBlockchain().generateBlock(voteMap.values());
                 voteMap.clear();
+                LOGGER.info("UnconfirmedPool cleaned.");
             } catch (Exception e) {
                 LOGGER.info("Couldn't clear unconfirmed pool: {}", e);
             }

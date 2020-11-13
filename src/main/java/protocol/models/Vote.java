@@ -14,12 +14,14 @@ public class Vote {
 
     /** Private declarations */
     private String electionId;
+    private String constituencyId;
     private String candidateId;
     private String digink;
 
     /** Public functions */
-    public Vote(String electionId, String voterFingerprint, String candidateId) throws Exception {
+    public Vote(String electionId, String voterFingerprint, String constituencyId, String candidateId) throws Exception {
         this.electionId = electionId;
+        this.constituencyId = constituencyId;
         this.candidateId = candidateId;
         this.digink = digink(voterFingerprint);
     }
