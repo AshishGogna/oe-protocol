@@ -95,6 +95,9 @@ public class UnconfirmedPool {
                     Node.getInstance().getBlockchain().generateBlock(voteMap.values());
                     voteMap.clear();
                 }
+
+                //Validate blockchain
+                Node.getInstance().getBlockchain().validate();
             } catch (Exception e) {
                 LOGGER.info("Couldn't clear unconfirmed pool: {}", e);
             }

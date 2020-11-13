@@ -140,6 +140,7 @@ public class Blockchain {
                 if (DataStore.hasBlock(block.getPreviousHash())) {
                     Block previousBlock = DataStore.readBlock(block.getPreviousHash());
                     Block previousBlockCopy = new Block(previousBlock);
+                    if (previousBlock.getSignature()!=null && previousBlock.getSignature().length()>0) previousBlockCopy.setSignature(previousBlock.getSignature());
                     previousBlockCopy.calculateHash();
                     if (!block.getPreviousHash().equals(previousBlockCopy.getHash())) throw new NodeException(NodeException.Reason.HashMismatch);
                     previousBlockCopy.setHash(block.getHash());
