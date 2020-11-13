@@ -48,6 +48,7 @@ public class NodeApi extends Api {
     @Path("/vote")
     public ApiResponse<VoteResponsePayload> vote(VoteRequestPayload request) {
         try {
+            if (!Node.getInstance().isThisAuthority()) throw new NodeException(NodeException.Reason.NotAnAuthority);
             String voteDigink = Node.getInstance().vote(request);
             return new ApiResponse(ApiStatus.OK, new VoteResponsePayload(voteDigink));
         } catch (NodeException e) {

@@ -14,4 +14,5 @@ public class Config {
     /** Private declarations */
     private String endpoint;
     private int cleanerInterval;
+    private String secret;
 }

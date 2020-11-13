@@ -21,15 +21,13 @@ public class MainClass {
     public static void main(String[] args) {
         try {
             new NodeApplication().run(args);
-            if (args.length < 2) {
-                LOGGER.error("Invalid init args. Exiting.");
-                return;
-            }
-            String pwd = getPassword();
+
+            Config config = DataStore.readConfig();
+
+            String pwd = config.getSecret();
             boolean isAuthority = Node.isAuthority(pwd);
             if (!isAuthority) pwd = null;
 
-            Config config = DataStore.readConfig();
             Node.initialize(config.getEndpoint(), config.getCleanerInterval(), pwd);
             LOGGER.info("***********************************");
             LOGGER.info("Node Initialized.");

@@ -56,16 +56,17 @@ public class UnconfirmedPool {
     public String addVote(VoteRequestPayload vrp) throws NodeException {
 
         //Verify the LWC signature.
-        boolean lwcSolid = false;
-        try {
-            List<String> lwcs = DataStore.readLWCs();
-            for (String lwc : lwcs) {
-                VoteRequestPayload copy = new VoteRequestPayload(vrp);
-                lwcSolid = Crypto.verifySignature(vrp.getSignature(), lwc, copy.jsonify());
-                if (lwcSolid) break;
-            }
-        } catch (Exception ignored) { }
-        if (!lwcSolid) throw new NodeException(NodeException.Reason.VoteTampered);
+        //Bypassed for testing LWC.
+//        boolean lwcSolid = false;
+//        try {
+//            List<String> lwcs = DataStore.readLWCs();
+//            for (String lwc : lwcs) {
+//                VoteRequestPayload copy = new VoteRequestPayload(vrp);
+//                lwcSolid = Crypto.verifySignature(vrp.getSignature(), lwc, copy.jsonify());
+//                if (lwcSolid) break;
+//            }
+//        } catch (Exception ignored) { }
+//        if (!lwcSolid) throw new NodeException(NodeException.Reason.VoteTampered);
 
         //Add to the unconfirmed pool
         try {
@@ -99,6 +100,10 @@ public class UnconfirmedPool {
                 //Validate blockchain
                 Node.getInstance().getBlockchain().validate();
             } catch (Exception e) {
+                if (e instanceof NodeException) {
+                    NodeException ne = (NodeException) e;
+                    if (ne.getReason().equals(NodeException.Reason.NotAnAuthority)) voteMap.clear();
+                }
                 LOGGER.info("Couldn't clear unconfirmed pool: {}", e);
             }
         }

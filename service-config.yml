@@ -9,12 +9,6 @@ server:
   applicationConnectors:
     - type: http
       port: 9000
-    - type: https
-      port: 443
-      keyStorePath: ./keystore.jks
-      keyStorePassword: NotSoSmartFox
-      validateCerts: false
-      validatePeers: false
   adminConnectors:
     - type: http
       port: 9001

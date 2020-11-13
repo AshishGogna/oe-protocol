@@ -16,6 +16,8 @@ public class AddRegistryEntityRequest {
     private String entity;
 
     /** Public functions */
+    public AddRegistryEntityRequest() { }
+
     public AddRegistryEntityRequest(String signature, String entity) {
         this.signature = signature;
         this.entity = entity;

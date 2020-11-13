@@ -189,5 +189,10 @@ public class Blockchain {
         if (blocksValidated != summary.getBlocks()) solid = false;
 
         LOGGER.info("Blockchain validation finished : {}", solid);
+        if (!solid) resync();
+    }
+
+    private void resync() {
+        LOGGER.info("Blockchain resync started.");
     }
 }

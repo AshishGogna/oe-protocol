@@ -16,6 +16,8 @@ public class AddBlockRequest {
     private Block block;
 
     /** Public functions */
+    public AddBlockRequest() { }
+
     public AddBlockRequest(Block block) {
         this.block = block;
     }
