@@ -31,7 +31,7 @@ Each node in the network their list of nodes with each other.
 Each node also has a list of public keys of all the authority nodes in the network. It is stored in `registry/auths` file.
 When a new block is shared with a node, it accepts it only after verifying the digital signature of that block using the public keys available in this list. If none of the public keys are able to verify the digital signature, the block is not accepte.
 
-One more list of public keys is maintained by the nodes which is the list of public keys of the light weight clients, which the voters use as an interface to caste their votes. It is stored in `registry/lwcs`.
+One more list of public keys is maintained by the nodes which is the list of public keys of the light weight clients, which the voters use as an interface to cast their votes. It is stored in `registry/lwcs`.
 When an authority node receives a new vote submission, it verifies the digital signature of the request using the list of public keys of all lightweight clients in the network, If none of the are able to verify the signature, the vote is not accepted.
 
 #### 2. Blockchain
@@ -73,3 +73,8 @@ The blockchain validation process is as follows:
 3. Validate Merkle root.
 4. Validate diginks.
 If any one of these validations fail for any block, then the blockchain is considered incorrect and latest version of it is fetched from an authority node. The newly fetched blockchain is validated with the same process and if it fails, this process is continued until a valid version of blockchain is synced from an authority node.
+
+#### Light Weight Client
+Light weight user facing applications can built to easy user interaction with the Open Elect system.
+These light weight clients submit voters' votes to the system and present the voting data from the blockchain.
+Once such light weight client: a web app has been implemented: https://github.com/AshishGogna/oe-lwc
