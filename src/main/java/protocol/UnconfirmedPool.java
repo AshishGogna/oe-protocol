@@ -22,10 +22,10 @@ public class UnconfirmedPool {
     private Map<String, Vote> voteMap;
 
     /** Public functions */
-    public UnconfirmedPool() {
+    public UnconfirmedPool(int poolCleanerDelay) {
         voteMap = new HashMap();
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleWithFixedDelay(new UnconfirmedPoolCleaner(), 1, 1, TimeUnit.SECONDS);
+        scheduler.scheduleWithFixedDelay(new UnconfirmedPoolCleaner(), poolCleanerDelay, poolCleanerDelay, TimeUnit.SECONDS);
 
         try {
 //        Test
@@ -88,8 +88,10 @@ public class UnconfirmedPool {
         /** Private classes: Public functions */
         public void run() {
             try {
-                Node.getInstance().getBlockchain().generateBlock(voteMap.values());
-                voteMap.clear();
+                if (voteMap.size() > 0) {
+                    Node.getInstance().getBlockchain().generateBlock(voteMap.values());
+                    voteMap.clear();
+                }
                 LOGGER.info("UnconfirmedPool cleaned.");
             } catch (Exception e) {
                 LOGGER.info("Couldn't clear unconfirmed pool: {}", e);

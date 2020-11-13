@@ -36,17 +36,17 @@ public class DataStore {
         return readFromFile(PATH_SUMMARY, Summary.class);
     }
 
-    public static void writeSummary(String data) throws IOException {
-        writeToFile(PATH_SUMMARY, data);
+    public static void writeSummary(String data) throws NodeException {
+        try { writeToFile(PATH_SUMMARY, data); } catch (Exception e) { throw new NodeException(NodeException.Reason.DataStoreFailure, e); }
     }
 
-    public static void writeBlock(String fileName, String data) throws Exception {
+    public static void writeBlock(String fileName, String data) throws NodeException {
         String path = PATH_BLOCKS + fileName;
 
         File f = new File(path);
         if (f.exists()) throw new NodeException(NodeException.Reason.BlockAlreadyExists);
 
-        writeToFile(path, data);
+        try { writeToFile(path, data); } catch (Exception e) { throw new NodeException(NodeException.Reason.DataStoreFailure, e); }
     }
 
     public static boolean hasBlock(String hash) {
@@ -83,15 +83,17 @@ public class DataStore {
         return lwcs;
     }
 
-    public static List<String> readAuths() throws Exception {
+    public static List<String> readAuths() {
 
         File f = new File(PATH_AUTHS);
         if (!f.exists()) return new ArrayList<>();
 
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayNode data = mapper.readValue(readFromFile(PATH_AUTHS), ArrayNode.class);
         List<String> auths = new ArrayList<>();
-        for (int i=0; i<data.size(); i++) auths.add(data.get(i).asText());
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            ArrayNode data = mapper.readValue(readFromFile(PATH_AUTHS), ArrayNode.class);
+            for (int i = 0; i < data.size(); i++) auths.add(data.get(i).asText());
+        } catch (Exception ignored) { }
         return auths;
     }
 

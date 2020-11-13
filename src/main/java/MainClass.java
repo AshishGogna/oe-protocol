@@ -1,12 +1,8 @@
-import api.NodeApplication;
-import api.models.VoteRequestPayload;
-import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import protocol.Blockchain;
-import protocol.Crypto;
-import protocol.Node;
-import protocol.UnconfirmedPool;
+import protocol.*;
+
+import java.io.Console;
 
 /**
  * Author: Ashish Gogna
@@ -21,8 +17,23 @@ public class MainClass {
     public static void main(String[] args) {
         try {
 //            new NodeApplication().run(args);
-            Node.initialize(args[0]);
-            LOGGER.info("*** Open Elections Node Initialized ***");
+            if (args.length < 2) {
+                LOGGER.error("Invalid init args. Exiting.");
+                return;
+            }
+            String pwd = getPassword();
+            boolean isAuthority = Node.isAuthority(pwd);
+            if (!isAuthority) pwd = null;
+
+            Node.initialize(args[0], Integer.parseInt(args[1]), pwd);
+            LOGGER.info("***********************************");
+            LOGGER.info("Node Initialized.");
+            LOGGER.info("Node type: {}", (!isAuthority) ? "Basic": "Authority");
+            if (isAuthority) {
+                LOGGER.info("Node Public Key: {}", DataStore.readAuth().getPublicKey());
+            }
+            LOGGER.info("***********************************");
+            Node.getInstance().getRegistery().shareSelf();
 
             //Test
 //            try {
@@ -40,5 +51,21 @@ public class MainClass {
         } catch (Exception e) {
             LOGGER.error("Terminating due to exception while trying to initialize node: {}", e);
         }
+    }
+
+    /** Private functions */
+    private static String getPassword() {
+        String pwd = null;
+        Console con = System.console();
+        if(con != null) {
+            try {
+                DataStore.readAuth().getNodePublicKey();
+                System.out.println("Enter private key password: ");
+                char[] ch = con.readPassword();
+                pwd = String.valueOf(ch);
+            } catch (Exception ignored) { }
+        }
+        if (pwd.length() == 0) pwd = null;
+        return pwd;
     }
 }

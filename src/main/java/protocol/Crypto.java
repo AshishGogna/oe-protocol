@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import protocol.models.Block;
+import protocol.models.NodeException;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -27,16 +28,20 @@ public class Crypto {
     private static final Logger LOGGER = LoggerFactory.getLogger(Crypto.class);
 
     /** Public functions */
-    public static String sha256(String input) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(input.getBytes("UTF-8"));
-        StringBuffer hexString = new StringBuffer();
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
+    public static String sha256(String input) throws NodeException {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes("UTF-8"));
+            StringBuffer hexString = new StringBuffer();
+            for (int i = 0; i < hash.length; i++) {
+                String hex = Integer.toHexString(0xff & hash[i]);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            throw new NodeException(NodeException.Reason.CryptoFailure, e);
         }
-        return hexString.toString();
     }
 
     public static String createSignature(String privateKey, String data) throws Exception {
@@ -64,7 +69,7 @@ public class Crypto {
         return dsa.verify(Base64.getDecoder().decode(signature));
     }
 
-    public static String calculateMerkleRoot(List<String> diginks) throws Exception {
+    public static String calculateMerkleRoot(List<String> diginks) throws NodeException {
         List<String> merkleRoot = generateMerkleTree(diginks);
         return merkleRoot.get(0);
     }
@@ -99,7 +104,7 @@ public class Crypto {
     }
 
     /** Private functions */
-    private static List<String> generateMerkleTree(List<String> diginks) throws Exception {
+    private static List<String> generateMerkleTree(List<String> diginks) throws NodeException {
         if (diginks.size() == 1) return diginks;
 
         List<String> parentHashList = new ArrayList();

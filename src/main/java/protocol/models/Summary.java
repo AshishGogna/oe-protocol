@@ -21,12 +21,12 @@ public class Summary {
         return s == null ? new Summary() : s;
     }
 
-    public void update() throws IOException {
+    public void update() throws NodeException {
         DataStore.writeSummary(this.toString());
     }
 
     public String getLastBlock() { return lastBlock; }
-    public void setLastBlock(String lastBlock) throws IOException {
+    public void setLastBlock(String lastBlock) throws NodeException {
         this.lastBlock = lastBlock;
         update();
     }

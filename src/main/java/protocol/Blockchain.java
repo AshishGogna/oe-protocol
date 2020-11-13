@@ -52,9 +52,12 @@ public class Blockchain {
 
         //Add to the blockchain
         addBlock(block);
+
+        //Share with the network.
+        Node.getInstance().getRegistery().shareNewBlock(block);
     }
 
-    public void addBlock(Block block) throws Exception {
+    public void addBlock(Block block) throws NodeException {
 
         //Validate previous hash
         if (summary.getLastBlock() != block.getPreviousHash()) throw new NodeException(NodeException.Reason.PreviousHashMismatch);
@@ -106,8 +109,6 @@ public class Blockchain {
     }
 
     public boolean voteExists(String digink) {
-        //TODO: Scan through indexed blockchain
-
         //Scan through the block chain
         String bHash = summary.getLastBlock();
         while (DataStore.hasBlock(bHash)) {
@@ -121,6 +122,4 @@ public class Blockchain {
         }
         return false;
     }
-
-    /** Private functions */
 }

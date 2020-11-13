@@ -16,7 +16,11 @@ public class NodeException extends Exception {
         HashMismatch,
         BlockTampered,
         MerkleRootMismatch,
-        DiginkDuplicate
+        DiginkDuplicate,
+        SignatureVerificationFailed,
+        CryptoFailure,
+        DataStoreFailure,
+        NotAnAuthority
     }
 
     /** Private declarations */

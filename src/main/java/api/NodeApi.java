@@ -1,9 +1,6 @@
 package api;
 
-import api.models.ApiResponse;
-import api.models.ApiStatus;
-import api.models.VoteRequestPayload;
-import api.models.VoteResponsePayload;
+import api.models.*;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,5 +54,79 @@ public class NodeApi extends Api {
             LOGGER.error("Exception caught at /vote: {}", e);
             return processException(e);
         }
+    }
+
+    @POST
+    @Path("/add-block")
+    public ApiResponse addBlock(AddBlockRequest request) {
+        try {
+            Node.getInstance().getBlockchain().addBlock(request.getBlock());
+            return new ApiResponse(ApiStatus.OK);
+        } catch (NodeException e) {
+            LOGGER.error("Exception caught at /add-block: {}", e);
+            return processException(e);
+        }
+    }
+
+    @POST
+    @Path("/add-auth")
+    public ApiResponse addAuth(AddRegistryEntityRequest request) {
+        try {
+            Node.getInstance().getRegistery().addAuth(request);
+            return new ApiResponse(ApiStatus.OK);
+        } catch (NodeException e) {
+            LOGGER.error("Exception caught at /add-auth: {}", e);
+            return processException(e);
+        }
+    }
+
+    @POST
+    @Path("/add-lwc")
+    public ApiResponse addLwc(AddRegistryEntityRequest request) {
+        try {
+            Node.getInstance().getRegistery().addLwc(request);
+            return new ApiResponse(ApiStatus.OK);
+        } catch (NodeException e) {
+            LOGGER.error("Exception caught at /add-lwc: {}", e);
+            return processException(e);
+        }
+    }
+
+    @POST
+    @Path("/add-node")
+    public ApiResponse addNode(AddRegistryEntityRequest request) {
+        Node.getInstance().getRegistery().addNode(request);
+        return new ApiResponse(ApiStatus.OK);
+    }
+
+    @POST
+    @Path("/rem-auth")
+    public ApiResponse remAuth(AddRegistryEntityRequest request) {
+        try {
+            Node.getInstance().getRegistery().remAuth(request);
+            return new ApiResponse(ApiStatus.OK);
+        } catch (NodeException e) {
+            LOGGER.error("Exception caught at /rem-auth: {}", e);
+            return processException(e);
+        }
+    }
+
+    @POST
+    @Path("/rem-lwc")
+    public ApiResponse remLwc(AddRegistryEntityRequest request) {
+        try {
+            Node.getInstance().getRegistery().remLwc(request);
+            return new ApiResponse(ApiStatus.OK);
+        } catch (NodeException e) {
+            LOGGER.error("Exception caught at /rem-lwc: {}", e);
+            return processException(e);
+        }
+    }
+
+    @POST
+    @Path("/rem-node")
+    public ApiResponse remNode(AddRegistryEntityRequest request) {
+        Node.getInstance().getRegistery().remNode(request);
+        return new ApiResponse(ApiStatus.OK);
     }
 }
