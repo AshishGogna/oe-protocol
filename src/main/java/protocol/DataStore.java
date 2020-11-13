@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import protocol.models.Auth;
-import protocol.models.Block;
-import protocol.models.NodeException;
-import protocol.models.Summary;
+import protocol.models.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,6 +20,7 @@ import java.util.*;
 public class DataStore {
 
     /** Private declarations */
+    private static final String PATH_CONFIG = "./config";
     private static final String PATH_SUMMARY = "./data/sum";
     private static final String PATH_BLOCKS = "./data/blocks/";
     private static final String PATH_AUTH = "./auth";
@@ -32,6 +30,10 @@ public class DataStore {
     private static final Logger LOGGER = LoggerFactory.getLogger(DataStore.class);
 
     /** Public functions */
+    public static Config readConfig() throws FileNotFoundException {
+        return readFromFile(PATH_CONFIG, Config.class);
+    }
+
     public static Summary readSummary() throws FileNotFoundException {
         return readFromFile(PATH_SUMMARY, Summary.class);
     }

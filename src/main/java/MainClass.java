@@ -1,8 +1,10 @@
+import api.NodeApplication;
 import api.models.VoteRequestPayload;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import protocol.*;
+import protocol.models.Config;
 
 import java.io.Console;
 
@@ -18,7 +20,7 @@ public class MainClass {
     /** Public functions */
     public static void main(String[] args) {
         try {
-//            new NodeApplication().run(args);
+            new NodeApplication().run(args);
             if (args.length < 2) {
                 LOGGER.error("Invalid init args. Exiting.");
                 return;
@@ -27,7 +29,8 @@ public class MainClass {
             boolean isAuthority = Node.isAuthority(pwd);
             if (!isAuthority) pwd = null;
 
-            Node.initialize(args[0], Integer.parseInt(args[1]), pwd);
+            Config config = DataStore.readConfig();
+            Node.initialize(config.getEndpoint(), config.getCleanerInterval(), pwd);
             LOGGER.info("***********************************");
             LOGGER.info("Node Initialized.");
             LOGGER.info("Node type: {}", (!isAuthority) ? "Basic": "Authority");
