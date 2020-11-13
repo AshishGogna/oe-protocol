@@ -20,16 +20,16 @@ public class Block {
     /** Private declarations */
     private List<Vote> votes;
     private long timestamp;
-    private String merkleRoot;
+    private String mRoot;
     private String previousHash;
     private String signature;
     private String hash;
 
     /** Public functions */
-    public Block(long timestamp, String previousHash, String merkleRoot, List<Vote> votes) throws Exception {
+    public Block(long timestamp, String previousHash, String mRoot, List<Vote> votes) throws Exception {
         this.timestamp = timestamp;
         this.previousHash = previousHash;
-        this.merkleRoot = merkleRoot;
+        this.mRoot = mRoot;
         this.votes = votes;
         this.signature = sign();
         this.hash = hash();
@@ -38,7 +38,7 @@ public class Block {
     public Block(Block block) {
         this.timestamp = block.timestamp;
         this.previousHash = block.previousHash;
-        this.merkleRoot = block.merkleRoot;
+        this.mRoot = block.mRoot;
         this.votes = block.votes;
     }
 

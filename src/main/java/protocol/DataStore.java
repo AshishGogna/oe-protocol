@@ -183,9 +183,9 @@ public class DataStore {
 
     /** Private functions */
     private static void writeToFile(String path, String data) throws IOException {
-        FileWriter myWriter = new FileWriter(path);
-        myWriter.write(data);
-        myWriter.close();
+        FileWriter w = new FileWriter(path);
+        w.write(data);
+        w.close();
     }
 
     private static <T> T readFromFile(String path, Class<T> t) throws FileNotFoundException {
@@ -196,6 +196,7 @@ public class DataStore {
             String data = r.nextLine();
             json += data;
         }
+        r.close();
         Gson gson = new Gson();
         return gson.fromJson(json, t);
     }
@@ -208,6 +209,7 @@ public class DataStore {
             String data = r.nextLine();
             json += data;
         }
+        r.close();
         return json;
     }
 }

@@ -1,6 +1,7 @@
 package protocol.models;
 
 import com.google.gson.Gson;
+import lombok.Getter;
 import protocol.DataStore;
 
 import java.io.FileNotFoundException;
@@ -10,10 +11,12 @@ import java.io.IOException;
  * Author: Ashish Gogna
  */
 
+@Getter
 public class Summary {
 
     /** Private declarations */
     private String lastBlock;
+    private int blocks;
 
     /** Public functions */
     public static Summary refresh() throws FileNotFoundException {
@@ -25,9 +28,9 @@ public class Summary {
         DataStore.writeSummary(this.toString());
     }
 
-    public String getLastBlock() { return lastBlock; }
-    public void setLastBlock(String lastBlock) throws NodeException {
+    public void blockAdded(String lastBlock) throws NodeException {
         this.lastBlock = lastBlock;
+        this.blocks++;
         update();
     }
 
