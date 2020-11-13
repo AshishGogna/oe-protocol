@@ -9,7 +9,9 @@ To build this, and run this implementation of Open Elect node on your computing 
 1. Clone the repo `$ git clone https://github.com/AshishGogna/oe-protocol`
 2. Go to the directory `$ cd oe-protocol`
 3. Build the JAR `$ mvn clean package`
-4. Set the node's endpoint in `config` file. By default, it is http://localhost:9000/
+4. Set the node's endpoint in `config` file. By default, it is http://localhost:9000
+This endpoint is shared with other nodes in the network. It tells them where to reach your node at.
+The endpoint will be `"http://[device-ip or domain]:9000"`
 5. Run the JAR `$ java -jar target/OpenElectionsNode.jar server service-config.yml`
 
 ## Protocol
