@@ -203,22 +203,26 @@ public class Blockchain {
     public void resync() {
         LOGGER.info("Blockchain resync started.");
 
-        //Remove all blocks
-        DataStore.removeBlocks();
-
         //Fetch the Blockchain from the network.
         try {
             PackagedBlockchainResponse pbcr = Node.getInstance().getRegistery().getBlockchain(0);
+            if (pbcr == null) {
+                LOGGER.info("Couldn't fetch blockchain from any node.");
+                return;
+            };
+
+            //Remove all blocks
+            DataStore.removeBlocks();
+
             for (Block b : pbcr.getBlocks()) {
                 DataStore.writeBlock(b.getHash(), b.toString());
             }
             summary.setLastBlock(pbcr.getLastBock());
             summary.setBlocks(pbcr.getBlocks().size());
             summary.update();
+            LOGGER.info("Blockchain synced.");
         } catch (NodeException e) {
             LOGGER.error("Couldn't sync blockchain: {}", e);
         }
-
-        LOGGER.info("Blockchain synced.");
     }
 }
