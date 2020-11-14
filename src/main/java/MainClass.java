@@ -37,6 +37,7 @@ public class MainClass {
             }
             LOGGER.info("***********************************");
             Node.getInstance().getRegistery().shareSelf();
+            Node.getInstance().getBlockchain().resync();
 
             //Test
             try {

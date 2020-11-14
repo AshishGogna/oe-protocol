@@ -5,9 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import protocol.Node;
-import protocol.UnconfirmedPool;
 import protocol.models.NodeException;
-import protocol.models.Vote;
+import api.models.PackagedBlockchainResponse;
 
 import javax.validation.Validator;
 import javax.ws.rs.GET;
@@ -129,5 +128,11 @@ public class NodeApi extends Api {
     public ApiResponse remNode(AddRegistryEntityRequest request) {
         Node.getInstance().getRegistery().remNode(request);
         return new ApiResponse(ApiStatus.OK);
+    }
+
+    @POST
+    @Path("/get-blockchain")
+    public ApiResponse<PackagedBlockchainResponse> getBlockchain() {
+        return new ApiResponse(ApiStatus.OK, Node.getInstance().getBlockchain().getPackaged());
     }
 }

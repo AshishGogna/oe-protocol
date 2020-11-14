@@ -43,6 +43,10 @@ public class DataStore {
     }
 
     public static void writeBlock(String fileName, String data) throws NodeException {
+
+        File directory = new File(PATH_BLOCKS);
+        if (! directory.exists()) { directory.mkdir(); }
+
         String path = PATH_BLOCKS + fileName;
 
         File f = new File(path);
@@ -181,6 +185,18 @@ public class DataStore {
         Gson gson = new Gson();
         writeToFile(PATH_AUTHS, gson.toJson(auths));
         LOGGER.info("Auth removed from registry: {}", publicKey);
+    }
+
+    public static void removeBlocks() {
+        try {
+            File f = new File(PATH_BLOCKS);
+            String[] entries = f.list();
+            for (String s : entries) {
+                File currentFile = new File(f.getPath(), s);
+                currentFile.delete();
+            }
+            f.delete();
+        } catch (Exception ignored) { }
     }
 
     /** Private functions */

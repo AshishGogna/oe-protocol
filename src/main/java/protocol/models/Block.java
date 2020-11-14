@@ -1,5 +1,6 @@
 package protocol.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;

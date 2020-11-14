@@ -2,6 +2,7 @@ package protocol.models;
 
 import com.google.gson.Gson;
 import lombok.Getter;
+import lombok.Setter;
 import protocol.DataStore;
 
 import java.io.FileNotFoundException;
@@ -12,6 +13,7 @@ import java.io.IOException;
  */
 
 @Getter
+@Setter
 public class Summary {
 
     /** Private declarations */

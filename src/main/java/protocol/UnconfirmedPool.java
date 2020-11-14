@@ -89,12 +89,11 @@ public class UnconfirmedPool {
         /** Private classes: Public functions */
         public void run() {
             try {
-                LOGGER.info("UnconfirmedPool cleaner run.");
-
                 //Generate block
                 if (voteMap.size() > 0) {
                     Node.getInstance().getBlockchain().generateBlock(voteMap.values());
                     voteMap.clear();
+                    LOGGER.info("UnconfirmedPool cleaned.");
                 }
 
                 //Validate blockchain

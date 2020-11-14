@@ -1,16 +1,14 @@
 package protocol;
 
+import api.models.PackagedBlockchainResponse;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import protocol.models.Block;
-import protocol.models.NodeException;
-import protocol.models.Summary;
-import protocol.models.Vote;
+import protocol.models.*;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Author: Ashish Gogna
@@ -23,15 +21,12 @@ public class Blockchain {
     private static final Logger LOGGER = LoggerFactory.getLogger(Blockchain.class);
 
     private Summary summary;
+    private boolean syncedOnStartup;
 
     /** Public functions */
     public Blockchain() throws Exception {
 
         summary = Summary.refresh();
-
-        //Genesis block
-        //try { addBlock(new Block(System.currentTimeMillis(), "0", "0", null)); } catch (Exception e) { LOGGER.error("{}", e); }
-
         LOGGER.info("Blockchain summary: {}", summary.toString());
     }
 
@@ -124,6 +119,7 @@ public class Blockchain {
     }
 
     public void validate() {
+
         LOGGER.info("Blockchain validation started: {}", summary);
 
         boolean solid = true;
@@ -131,8 +127,6 @@ public class Blockchain {
         String bHash = summary.getLastBlock();
         while (DataStore.hasBlock(bHash)) {
             try {
-                LOGGER.info("Validating block: {}", bHash);
-
                 Block block = DataStore.readBlock(bHash);
                 Block copy = new Block(block);
 
@@ -140,7 +134,10 @@ public class Blockchain {
                 if (DataStore.hasBlock(block.getPreviousHash())) {
                     Block previousBlock = DataStore.readBlock(block.getPreviousHash());
                     Block previousBlockCopy = new Block(previousBlock);
-                    if (previousBlock.getSignature()!=null && previousBlock.getSignature().length()>0) previousBlockCopy.setSignature(previousBlock.getSignature());
+
+                    if (previousBlock.getSignature() !=null ) {
+                        previousBlockCopy.setSignature(previousBlock.getSignature());
+                    }
                     previousBlockCopy.calculateHash();
                     if (!block.getPreviousHash().equals(previousBlockCopy.getHash())) throw new NodeException(NodeException.Reason.HashMismatch);
                     previousBlockCopy.setHash(block.getHash());
@@ -192,7 +189,36 @@ public class Blockchain {
         if (!solid) resync();
     }
 
-    private void resync() {
+    public PackagedBlockchainResponse getPackaged() {
+        List<Block> blocks = new ArrayList<>();
+        String bHash = summary.getLastBlock();
+        while (DataStore.hasBlock(bHash)) {
+            Block b = DataStore.readBlock(bHash);
+            blocks.add(b);
+            bHash = b.getPreviousHash();
+        }
+        return new PackagedBlockchainResponse(summary.getLastBlock(), blocks);
+    }
+
+    public void resync() {
         LOGGER.info("Blockchain resync started.");
+
+        //Remove all blocks
+        DataStore.removeBlocks();
+
+        //Fetch the Blockchain from the network.
+        try {
+            PackagedBlockchainResponse pbcr = Node.getInstance().getRegistery().getBlockchain(0);
+            for (Block b : pbcr.getBlocks()) {
+                DataStore.writeBlock(b.getHash(), b.toString());
+            }
+            summary.setLastBlock(pbcr.getLastBock());
+            summary.setBlocks(pbcr.getBlocks().size());
+            summary.update();
+        } catch (NodeException e) {
+            LOGGER.error("Couldn't sync blockchain: {}", e);
+        }
+
+        LOGGER.info("Blockchain synced.");
     }
 }
